@@ -9,7 +9,7 @@ Pytorch implemention of "Progressive Perception-Oriented Network for Single Imag
 </p>
 
 <p align="center">
-    <img src="figures/Show.jpg" width="960"> <br />
+    <img src="figures/show.jpg" width="960"> <br />
     <em> The example results</em>
 </p>
 
