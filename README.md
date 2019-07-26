@@ -13,6 +13,11 @@ Pytorch implemention of "Progressive Perception-Oriented Network for Single Imag
     <em> The example results</em>
 </p>
 
+<p align="center">
+    <img src="figures/visualization2.png" width="960"> <br />
+    <em> Visualization of intermediate feature maps</em>
+</p>
+
 ## Testing
 Pytorch 1.1
 * Download [PIRM_dataset](https://drive.google.com/open?id=1T-B-EAZVeXfbUu6Frnpa6X2u7kxxRyvt) and unzip it into folder `Test_Datasets`
