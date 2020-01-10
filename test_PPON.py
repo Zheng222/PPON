@@ -1,7 +1,7 @@
 import argparse
 import torch
 import os
-import skimage.io as sio
+import cv2
 import numpy as np
 import utils
 import skimage.color as sc
@@ -53,9 +53,9 @@ model.load_state_dict(torch.load(opt.models), strict=True)
 i = 0
 for imname in filelist:
     if opt.isHR:
-        im_gt = sio.imread(opt.test_hr_folder + imname.split('/')[-1])
+        im_gt = cv2.imread(opt.test_hr_folder + imname.split('/')[-1])[:, :, [2, 1, 0]]
         im_gt = utils.modcrop(im_gt, opt.upscale_factor)
-    im_l = sio.imread(imname)
+    im_l = cv2.imread(imname)[:, :, [2, 1, 0]]
     if len(im_l.shape) < 3:
         if opt.isHR:
             im_gt = im_gt[..., np.newaxis]
@@ -113,9 +113,9 @@ for imname in filelist:
     if not os.path.exists(opt.output_folder):
         os.makedirs(opt.output_folder)
 
-    sio.imsave(output_c_folder, out_img_c)
-    sio.imsave(output_s_folder, out_img_s)
-    sio.imsave(output_p_folder, out_img_p)
+    sio.imsave(output_c_folder, out_img_c[:, :, [2, 1, 0]])
+    sio.imsave(output_s_folder, out_img_s[:, :, [2, 1, 0]])
+    sio.imsave(output_p_folder, out_img_p[:, :, [2, 1, 0]])
     print('===> Saved {}-th image'.format(i))
 
 print('Mean PSNR for SR: {}'.format(np.mean(psnr_sr)))
