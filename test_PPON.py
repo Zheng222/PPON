@@ -113,9 +113,9 @@ for imname in filelist:
     if not os.path.exists(opt.output_folder):
         os.makedirs(opt.output_folder)
 
-    sio.imsave(output_c_folder, out_img_c[:, :, [2, 1, 0]])
-    sio.imsave(output_s_folder, out_img_s[:, :, [2, 1, 0]])
-    sio.imsave(output_p_folder, out_img_p[:, :, [2, 1, 0]])
+    cv2.imwrite(output_c_folder, out_img_c[:, :, [2, 1, 0]])
+    cv2.imwrite(output_s_folder, out_img_s[:, :, [2, 1, 0]])
+    cv2.imwrite(output_p_folder, out_img_p[:, :, [2, 1, 0]])
     print('===> Saved {}-th image'.format(i))
 
 print('Mean PSNR for SR: {}'.format(np.mean(psnr_sr)))
