@@ -46,7 +46,6 @@ class df2k_data(data.Dataset):
             img_in, img_tar = common.get_patch(
                 img_in, img_tar, patch_size=patch_size, scale=scale)
             img_in, img_tar = common.augment(img_in, img_tar)
-            img_in = common.add_noise(img_in, self.args.noise_level)
         else:
             ih, iw = img_in.shape[:2]
             img_tar = img_tar[0:ih * scale, 0:iw * scale, :]

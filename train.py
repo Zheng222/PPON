@@ -34,7 +34,6 @@ parser.add_argument("--rgb_range", type=int, default=1,
 parser.add_argument("--n_colors", type=int, default=3,
                     help="number of color channels to use")
 parser.add_argument("--seed", type=int, default=1)
-parser.add_argument("--noise_level", type=list, default=['G', 10])  # gaussian noise (level 10)
 
 parser.add_argument("--which_model", type=str, default="content")  # content | structure | perceptual
 parser.add_argument("--pixel_weight", type=float, default=1)
