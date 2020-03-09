@@ -39,15 +39,15 @@ python scripts/png2npy.py --pathFrom /path/to/DF2K/ --pathTo /path/to/DF2K_decod
 ```
 * Run training x4 model (stage 1, content)
 ```bash
-python train.py --nEpochs 1000 --test_every 690 --noise_level ['.', 10] --which_model "content" --lr_steps [200, 400, 600, 800] --save_path 'ckpt_stage1'
+python train.py --nEpochs 1000 --test_every 690 --which_model "content" --lr_steps [200, 400, 600, 800] --save_path 'ckpt_stage1'
 ```
 (stage 2, structure)
 ```bash
-python train.py --nEpochs 300 --test_every 138 --noise_level ['.', 10] --which_model "structure" --pixel_weight 0 --structure_weight 1 --lr_steps [100, 150, 200, 250] --save_path 'ckpt_stage2'
+python train.py --nEpochs 300 --test_every 138 --which_model "structure" --pixel_weight 0 --structure_weight 1 --lr_steps [100, 150, 200, 250] --save_path 'ckpt_stage2'
 ```
 (stage3, perceptual)
 ```bash
-python train.py --nEpochs 300 --test_every 138 --noise_level ['.', 10] --which_model "perceptual" --pixel_weight 0 --feature_weight 1 --gan_weight 0.005 --lr_steps [100, 150, 200, 250] --save_path 'ckpt_stage3'
+python train.py --nEpochs 300 --test_every 138 --which_model "perceptual" --pixel_weight 0 --feature_weight 1 --gan_weight 0.005 --lr_steps [100, 150, 200, 250] --save_path 'ckpt_stage3'
 ```
 
 
