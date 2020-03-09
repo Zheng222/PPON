@@ -7,10 +7,86 @@ import torchvision
 #######################
 # Generator
 #######################
-
-class PPON(nn.Module):
+class PPON_content(nn.Module):
     def __init__(self, in_nc, nf, nb, out_nc, upscale=4, act_type='lrelu'):
-        super(PPON, self).__init__()
+        super(PPON_content, self).__init__()
+        n_upscale = int(math.log(upscale, 2))
+        if upscale == 3:
+            n_upscale = 1
+
+        fea_conv = B.conv_layer(in_nc, nf, kernel_size=3)  # common
+        rb_blocks = [B.RRBlock_32() for _ in range(nb)]  # L1
+        LR_conv = B.conv_layer(nf, nf, kernel_size=3)
+
+        upsample_block = B.upconv_block
+
+        if upscale == 3:
+            upsampler = upsample_block(nf, nf, 3, act_type=act_type)
+        else:
+            upsampler = [upsample_block(nf, nf, act_type=act_type) for _ in range(n_upscale)]
+
+        HR_conv0 = B.conv_block(nf, nf, kernel_size=3, norm_type=None, act_type=act_type)
+        HR_conv1 = B.conv_block(nf, out_nc, kernel_size=3, norm_type=None, act_type=None)
+
+
+        self.CFEM = B.sequential(fea_conv, B.ShortcutBlock(B.sequential(*rb_blocks, LR_conv)))
+
+        self.CRM = B.sequential(*upsampler, HR_conv0, HR_conv1)  # recon content
+
+    def forward(self, x):
+        out_CFEM = self.CFEM(x)
+        out_c = self.CRM(out_CFEM)
+
+        return out_c
+
+
+class PPON_structure(nn.Module):
+    def __init__(self, in_nc, nf, nb, out_nc, upscale=4, act_type='lrelu'):
+        super(PPON_structure, self).__init__()
+        n_upscale = int(math.log(upscale, 2))
+        if upscale == 3:
+            n_upscale = 1
+
+        fea_conv = B.conv_layer(in_nc, nf, kernel_size=3)  # common
+        rb_blocks = [B.RRBlock_32() for _ in range(nb)]  # L1
+        LR_conv = B.conv_layer(nf, nf, kernel_size=3)
+
+        ssim_branch = [B.RRBlock_32() for _ in range(2)]  # SSIM
+
+        upsample_block = B.upconv_block
+
+        if upscale == 3:
+            upsampler = upsample_block(nf, nf, 3, act_type=act_type)
+            upsampler_ssim = upsample_block(nf, nf, 3, act_type=act_type)
+        else:
+            upsampler = [upsample_block(nf, nf, act_type=act_type) for _ in range(n_upscale)]
+            upsampler_ssim = [upsample_block(nf, nf, act_type=act_type) for _ in range(n_upscale)]
+
+        HR_conv0 = B.conv_block(nf, nf, kernel_size=3, norm_type=None, act_type=act_type)
+        HR_conv1 = B.conv_block(nf, out_nc, kernel_size=3, norm_type=None, act_type=None)
+
+        HR_conv0_S = B.conv_block(nf, nf, kernel_size=3, norm_type=None, act_type=act_type)
+        HR_conv1_S = B.conv_block(nf, out_nc, kernel_size=3, norm_type=None, act_type=None)
+
+        self.CFEM = B.sequential(fea_conv, B.ShortcutBlock(B.sequential(*rb_blocks, LR_conv)))
+        self.SFEM = B.sequential(*ssim_branch)
+
+        self.CRM = B.sequential(*upsampler, HR_conv0, HR_conv1)  # recon content
+        self.SRM = B.sequential(*upsampler_ssim, HR_conv0_S, HR_conv1_S)  # recon structure
+
+    def forward(self, x):
+        with torch.no_grad():
+            out_CFEM = self.CFEM(x)
+            out_c = self.CRM(out_CFEM)
+
+        out_SFEM = self.SFEM(out_CFEM)
+        out_s = self.SRM(out_SFEM) + out_c
+
+        return out_s
+
+class PPON_perceptual(nn.Module):
+    def __init__(self, in_nc, nf, nb, out_nc, upscale=4, act_type='lrelu'):
+        super(PPON_perceptual, self).__init__()
         n_upscale = int(math.log(upscale, 2))
         if upscale == 3:
             n_upscale = 1
@@ -46,9 +122,67 @@ class PPON(nn.Module):
         self.SFEM = B.sequential(*ssim_branch)
         self.PFEM = B.sequential(*gan_branch)
 
-        self.CRM = B.sequential(*upsampler, HR_conv0, HR_conv1)  # recon l1
-        self.SRM = B.sequential(*upsampler_ssim, HR_conv0_S, HR_conv1_S)  # recon ssim
-        self.PRM = B.sequential(*upsampler_gan, HR_conv0_P, HR_conv1_P)  # recon gan
+        self.CRM = B.sequential(*upsampler, HR_conv0, HR_conv1)  # recon content
+        self.SRM = B.sequential(*upsampler_ssim, HR_conv0_S, HR_conv1_S)  # recon structure
+        self.PRM = B.sequential(*upsampler_gan, HR_conv0_P, HR_conv1_P)  # recon perceptual
+
+    def forward(self, x):
+        with torch.no_grad():
+        
+            out_CFEM = self.CFEM(x)
+            out_c = self.CRM(out_CFEM)
+    
+            out_SFEM = self.SFEM(out_CFEM)
+            out_s = self.SRM(out_SFEM) + out_c
+
+        out_PFEM = self.PFEM(out_SFEM)
+        out_p = self.PRM(out_PFEM) + out_s
+
+        return out_p
+
+# deploy model
+class PPON(nn.Module):
+    def __init__(self, in_nc, nf, nb, out_nc, alpha=1.0, upscale=4, act_type='lrelu'):
+        super(PPON, self).__init__()
+        self.alpha = alpha
+        n_upscale = int(math.log(upscale, 2))
+        if upscale == 3:
+            n_upscale = 1
+
+        fea_conv = B.conv_layer(in_nc, nf, kernel_size=3)  # common
+        rb_blocks = [B.RRBlock_32() for _ in range(nb)]  # L1
+        LR_conv = B.conv_layer(nf, nf, kernel_size=3)
+
+        ssim_branch = [B.RRBlock_32() for _ in range(2)]  # SSIM
+        gan_branch = [B.RRBlock_32() for _ in range(2)]  # Gan
+
+        upsample_block = B.upconv_block
+
+        if upscale == 3:
+            upsampler = upsample_block(nf, nf, 3, act_type=act_type)
+            upsampler_ssim = upsample_block(nf, nf, 3, act_type=act_type)
+            upsampler_gan = upsample_block(nf, nf, 3, act_type=act_type)
+        else:
+            upsampler = [upsample_block(nf, nf, act_type=act_type) for _ in range(n_upscale)]
+            upsampler_ssim = [upsample_block(nf, nf, act_type=act_type) for _ in range(n_upscale)]
+            upsampler_gan = [upsample_block(nf, nf, act_type=act_type) for _ in range(n_upscale)]
+
+        HR_conv0 = B.conv_block(nf, nf, kernel_size=3, norm_type=None, act_type=act_type)
+        HR_conv1 = B.conv_block(nf, out_nc, kernel_size=3, norm_type=None, act_type=None)
+
+        HR_conv0_S = B.conv_block(nf, nf, kernel_size=3, norm_type=None, act_type=act_type)
+        HR_conv1_S = B.conv_block(nf, out_nc, kernel_size=3, norm_type=None, act_type=None)
+
+        HR_conv0_P = B.conv_block(nf, nf, kernel_size=3, norm_type=None, act_type=act_type)
+        HR_conv1_P = B.conv_block(nf, out_nc, kernel_size=3, norm_type=None, act_type=None)
+
+        self.CFEM = B.sequential(fea_conv, B.ShortcutBlock(B.sequential(*rb_blocks, LR_conv)))
+        self.SFEM = B.sequential(*ssim_branch)
+        self.PFEM = B.sequential(*gan_branch)
+
+        self.CRM = B.sequential(*upsampler, HR_conv0, HR_conv1)  # recon content
+        self.SRM = B.sequential(*upsampler_ssim, HR_conv0_S, HR_conv1_S)  # recon structure
+        self.PRM = B.sequential(*upsampler_gan, HR_conv0_P, HR_conv1_P)  # recon perceptual
 
     def forward(self, x):
         out_CFEM = self.CFEM(x)
@@ -58,7 +192,7 @@ class PPON(nn.Module):
         out_s = self.SRM(out_SFEM) + out_c
 
         out_PFEM = self.PFEM(out_SFEM)
-        out_p = self.PRM(out_PFEM) + out_s
+        out_p = self.alpha * self.PRM(out_PFEM) + out_s
 
         return out_c, out_s, out_p
 

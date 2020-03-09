@@ -73,11 +73,16 @@ def init_weights(net, init_type='kaiming', scale=1.0, std=0.02):
 ########################
 
 def define_G(args):
-    which_model = args.which_model_G
-    if which_model == 'ppon':
-        netG = arch.PPON(in_nc=3, nf=64, nb=24, out_nc=3)
+    if args.which_model == 'content':
+        netG = arch.PPON_content(in_nc=3, nf=64, nb=24, out_nc=3)
+    elif args.which_model == 'structure':
+        netG = arch.PPON_structure(in_nc=3, nf=64, nb=24, out_nc=3)
+    elif args.which_model == 'perceptual':
+        netG = arch.PPON_perceptual(in_nc=3, nf=64, nb=24, out_nc=3)
+    elif args.which_model == 'ppon':
+        netG = arch.PPON(in_nc=3, nf=64, nb=24, out_nc=3, alpha=args.alpha)
     else:
-        raise NotImplementedError('Generator models [{:s}] not recognized'.format(which_model))
+        raise NotImplementedError('Generator models [{:s}] not recognized'.format(args.which_model))
     if args.is_train:
         init_weights(netG, init_type='kaiming', scale=0.1)
     return netG
