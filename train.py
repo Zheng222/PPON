@@ -18,14 +18,6 @@ parser.add_argument("--testBatchSize", type=int, default=1,
                     help="testing batch size")
 parser.add_argument("-nEpochs", type=int, default=600,
                     help="number of epochs to train")
-# parser.add_argument("--lr", type=float, default=2e-4,
-#                     help="Learning Rate. Default=2e-4")
-# parser.add_argument("--step_size", type=int, default=200,
-#                     help="learning rate decay per N epochs")
-# parser.add_argument("--gamma", type=int, default=0.5,
-#                     help="learning rate decay factor for step decay")
-# parser.add_argument("--resume", default="", type=str,
-#                     help="path to checkpoint")
 parser.add_argument("--start-epoch", default=1, type=int,
                     help="manual epoch number")
 parser.add_argument("--test_every", type=int, default=138)
@@ -41,8 +33,6 @@ parser.add_argument("--rgb_range", type=int, default=1,
                     help="maxium value of RGB")
 parser.add_argument("--n_colors", type=int, default=3,
                     help="number of color channels to use")
-# parser.add_argument("--pretrained", default="", type=str,
-#                     help="path to pretrained models")
 parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("--noise_level", type=list, default=['G', 10])  # gaussian noise (level 10)
 
@@ -77,9 +67,8 @@ cudnn.benchmark = True
 
 print("===> Loading datasets")
 trainset = srdata.df2k_data(args)
-testset = val_data.DatasetFromFolderVal("/mnt/hz/datasets/Set5/",
-                                         "/mnt/hz/datasets/Set5_LRDN/x{}/".format(args.scale),
-                                         args.scale)
+testset = val_data.DatasetFromFolderVal("Test_Datasets/Set5/",
+                                         "Test_Datasets/Set5_LR/", args.scale)
 training_data_loader = DataLoader(dataset=trainset, num_workers=args.threads, batch_size=args.batch_size, shuffle=True,
                                   pin_memory=True, drop_last=True)
 testing_data_loader = DataLoader(dataset=testset, batch_size=args.testBatchSize, shuffle=False)
