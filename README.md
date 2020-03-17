@@ -22,6 +22,19 @@ Pytorch implemention of "Progressive Perception-Oriented Network for Single Imag
     <em> Visualization of intermediate feature maps</em>
 </p>
 
+<p align="center">
+    <img src="figures/structure_inference.png" width="480"> <br />
+    <em> The inference architecture of our PPON.</em>
+</p>
+
+<table>
+   <tr>
+       <td><img src="figures/278.gif"></td>
+       <td><img src="figures/300.gif"></td>
+   </tr>
+</table>
+
+
 ## Testing
 Pytorch 1.1
 * Download [PIRM_dataset](https://drive.google.com/open?id=1T-B-EAZVeXfbUu6Frnpa6X2u7kxxRyvt) and unzip it into folder `Test_Datasets`
