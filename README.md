@@ -3,14 +3,17 @@ Pytorch implemention of "Progressive Perception-Oriented Network for Single Imag
 
 [[arXiv]](https://arxiv.org/abs/1907.10399)
 
-<p align="center">
-    <img src="figures/Structure.png" width="480"> <br />
-    <em> The schematics of the Progressive Perception-Oriented Network</em>
-</p>
-
-<p align="center">
-  <img height="400" src="figures/269.gif">
-</p>
+<table>
+    <tr>
+        <td>
+            <img src="figures/Structure.png" width="480"> <br />
+            <em> The schematics of the Progressive Perception-Oriented Network</em>
+        </td>
+        <td>
+            <img height="400" src="figures/269.gif">
+        </td>
+    </tr>
+</table>
 
 <p align="center">
     <img src="figures/show.jpg" width="960"> <br />
