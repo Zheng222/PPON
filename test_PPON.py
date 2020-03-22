@@ -25,7 +25,7 @@ parser.add_argument('--upscale_factor', type=int, default=4, help='upscaling fac
 parser.add_argument('--only_y', action='store_true', default=True,
                     help='evaluate on y channel, if False evaluate on RGB channels')
 parser.add_argument('--isHR', action='store_true', default=True)
-parser.add_argument("--which_model_G", type=str, default="ppon")
+parser.add_argument("--which_model", type=str, default="ppon")
 opt = parser.parse_args()
 
 print(opt)
