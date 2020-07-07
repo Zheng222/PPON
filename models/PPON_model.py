@@ -158,8 +158,8 @@ class PPONModel(BaseModel):
 
         # RelativisticGAN
         if self.cri_gan:
-            pred_g_fake = self.netD(self.fake_H, self.fake_H)
-            pred_g_real = self.netD(self.var_H, self.var_H)
+            pred_g_fake = self.netD(self.fake_H)
+            pred_g_real = self.netD(self.var_H)
             pred_g_real.detach_()
             l_g_gan = self.l_gan_w * (self.cri_gan(pred_g_real - torch.mean(pred_g_fake), False) +
                                       self.cri_gan(pred_g_fake - torch.mean(pred_g_real), True)) / 2
@@ -175,8 +175,8 @@ class PPONModel(BaseModel):
                 p.requires_grad = True
 
             self.optimizer_D.zero_grad()
-            pred_d_real = self.netD(self.var_H, self.var_H)
-            pred_d_fake = self.netD(self.fake_H.detach(), self.fake_H.detach())  # detach to avoid BP to G
+            pred_d_real = self.netD(self.var_H)
+            pred_d_fake = self.netD(self.fake_H.detach())  # detach to avoid BP to G
             l_d_real = self.cri_gan(pred_d_real - torch.mean(pred_d_fake), True)
             l_d_fake = self.cri_gan(pred_d_fake - torch.mean(pred_d_real), False)
 
@@ -189,8 +189,8 @@ class PPONModel(BaseModel):
         if self.cri_pix:
             self.log_dict['l_g_pix'] = l_g_pix.item()
 
-        if self.args.structure_weight:
-            self.log_dict['l_g_ml1'] = l_g_ml1.item()
+        if self.args.structure_weight > 0:
+            self.log_dict['l_g_msl1'] = l_g_ml1.item()
             self.log_dict['l_g_msssim'] = l_g_mssim.item()
 
         if self.args.which_model == 'perceptual':
