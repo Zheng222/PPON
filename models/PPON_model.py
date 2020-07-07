@@ -246,7 +246,7 @@ class PPONModel(BaseModel):
                     f.write(message)
 
             if self.cri_fea:  # F, Preceptual Network
-                s, n = self.get_network_description(self.netF)
+                s, n = self.get_network_description(self.vgg)
                 print('Number of parameters in F: {:,d}'.format(n))
                 message = '\n\n\n---------------- Perceptual Network ---------------\n' + s + '\n'
                 with open(network_path, 'a') as f:
