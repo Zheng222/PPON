@@ -2,6 +2,7 @@
 Pytorch implemention of "Progressive Perception-Oriented Network for Single Image Super-Resolution"
 
 [[arXiv]](https://arxiv.org/abs/1907.10399)
+[[Information Sciences]](https://www.sciencedirect.com/science/article/pii/S002002552030880X)
 
 <table>
     <tr>
