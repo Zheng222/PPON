@@ -92,6 +92,8 @@ If you find PPON useful in your research, please consider citing:
   title={Progressive Perception-Oriented Network for Single Image Super-Resolution},
   author={Hui, Zheng and Li, Jie and Gao, Xinbo and Wang, Xiumei},
   journal={Information Sciences},
+  volume = {546},
+  pages = {769-786},
   year={2020}
 }
 ```
