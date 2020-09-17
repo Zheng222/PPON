@@ -88,12 +88,12 @@ If you find PPON useful in your research, please consider citing:
   year={2019}
 }
 
-@article{Hui-PPON-2020,
+@article{Hui-PPON-2021,
   title={Progressive Perception-Oriented Network for Single Image Super-Resolution},
   author={Hui, Zheng and Li, Jie and Gao, Xinbo and Wang, Xiumei},
   journal={Information Sciences},
   volume = {546},
   pages = {769-786},
-  year={2020}
+  year={2021}
 }
 ```
